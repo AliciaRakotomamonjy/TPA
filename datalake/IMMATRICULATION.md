@@ -1,4 +1,4 @@
-# import du fichier Catalogue.csv dans mongodb
+# Import du fichier Catalogue.csv dans mongodb
 
 ## Migration du fichier Immatriculations.csv dans HDFS
 
@@ -7,8 +7,9 @@
 $ hdfs dfs -mkdir /immatriculations
 ```
 
-### Migrer également Immatriculations.csv dans le répertoire `immatriculations` de HDFS
-### RQ: le fichier CO2.csv est dans le répertoire de la VM
+> [!TIP]
+> Le fichier immatriculations.csv est mis au préalable dans le répertoire de la VM
+
 ```bash
 $ hdfs dfs -put /vagrant/Immatriculations.csv /immatriculations/
 ```
@@ -17,9 +18,12 @@ Vérification de la copie
 ```bash
 $ hdfs dfs -ls /immatriculation
 ```
+
+**
 On a ce résultat
--"Found 1 item
--rw-r--r--   1 vagrant supergroup  120957648 2024-04-26 21:51 /immatriculations/Immatriculations.csv"
+__"Found 1 item
+-rw-r--r--   1 vagrant supergroup  120957648 2024-04-26 21:51 /immatriculations/Immatriculations.csv"__
+**
 
 ## Connexion à beeline puis HIVE
 
@@ -28,10 +32,12 @@ $ beeline
 > !connect jdbc:hive2://localhost:10000
 ```
 
+**
 On a le module de connexion qui s'affiche:
-    Enter username for jdbc:hive2://localhost:10000:
-    Enter password for jdbc:hive2://localhost:10000:
+    __Enter username for jdbc:hive2://localhost:10000:
+    Enter password for jdbc:hive2://localhost:10000:__
 Laisser les champs vides et cliquer sur "Enter"
+**
 
 
 On est maintenant connecté:
@@ -56,12 +62,15 @@ TBLPROPERTIES (
 'skip.header.line.count'='1');
 ```
 
-Vérification de la présence des données
--"SELECT COUNT(*) FROM IMMATRICULATIONS_HDFS_H_EXT;"
+**__Vérification de la présence des données__**
+```bash
+> SELECT COUNT(*) FROM IMMATRICULATIONS_HDFS_H_EXT;
+```
 
-Voici le résultat:
-+----------+
-|   _c0    |
-+----------+
-| 2000000  |
-+----------+
+
+**Voici le résultat:**
+> +----------+
+> |   _c0    |
+> +----------+
+> | 2000000  |
+> +----------+
