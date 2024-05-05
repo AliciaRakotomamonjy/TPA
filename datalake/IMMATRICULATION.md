@@ -16,7 +16,7 @@ $ hdfs dfs -put /vagrant/Immatriculations.csv /immatriculations/
 
 Vérification de la copie
 ```bash
-$ hdfs dfs -ls /immatriculation
+$ hdfs dfs -ls /immatriculations
 ```
 
 **

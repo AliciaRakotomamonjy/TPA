@@ -28,7 +28,7 @@ Pour quitter mongo, on excécute la commande exit
 > exit
 ```
 
-Après on se connecte sur hive (username: oracle, password : welcome1)
+Après on se connecte sur hive (username: , password : )
 ```bash
 $ beeline
 beeline> !connect jdbc:hive2://localhost:10000
