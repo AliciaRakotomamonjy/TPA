@@ -43,6 +43,8 @@ public class Marketing {
         // Lecture du fichier CSV et insertion des données dans la table MARKETING
         try {
             List<String> lines = Files.readAllLines(Paths.get(csvFilePath));
+            // Définir une variable booléenne pour suivre si nous sommes à la première ligne ou non
+            boolean isFirstLine = true;
             for (String line : lines) {
                 // Vérifier si nous sommes à la première ligne
                 if (isFirstLine) {
