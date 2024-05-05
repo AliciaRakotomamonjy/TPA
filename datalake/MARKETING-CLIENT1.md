@@ -9,7 +9,7 @@
 # Compilation des classes Java :
 >mkdir migrationKv
 >javac /$KVHOME/examples/hello/MigrationKvstore.java -d migrationKv
->javac /$KVHOME/examples/hello/MigrationKvstore.java -d migrationKv
+>javac /$KVHOME/examples/hello/Marketing.java -d migrationKv
 
 # Exécution des ETL 
 >java -cp $CLASSPATH:migrationKv MigrationKvstore
