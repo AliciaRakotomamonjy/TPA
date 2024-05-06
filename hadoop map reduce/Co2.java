@@ -1,114 +1,183 @@
 package org.mbds;
 
 import java.io.IOException;
-import java.util.StringTokenizer;
-
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
+import java.util.regex.Pattern;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.apache.hadoop.util.GenericOptionsParser;
+import java.io.UnsupportedEncodingException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
+import java.text.DecimalFormat;
 
 public class Co2 {
 
+    private static final Log LOG = LogFactory.getLog(Co2.class);
+
     //Classe Mapper CO2
     public static class CO2Mapper extends Mapper<LongWritable, Text, Text, Text> {
-        private static final Pattern DELIMITER = Pattern.compile(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
+        private Text outputKey = new Text();
+        private Text outputValue = new Text();
+        private boolean isHeader = true;
     
         public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
-            String line = value.toString();
-            String[] fields = DELIMITER.split(line);
+            if (key.get() == 0)return;
     
-            if (fields.length >= 5) {
-                String marqueModele = fields[1].trim();
+            String[] fields = value.toString().split(",");
+            if (fields.length <= 5) {
+                String marqueModele = getMarque(fields[1]);
+                String bonusMalus = getBonus(fields[2]);
+                String rejetsC02 = fields[3].trim();
+                String coutEnergie = getCout(fields[4]);
+
+                String attributs = bonusMalus + "," + rejetsC02 + "," + coutEnergie;
+                this.outputKey.set(marqueModele);
+                this.outputValue.set(new Text(attributs));
+                context.write(this.outputKey, this.outputValue);
+            } else if(fields.length > 5){
+                String marqueModele = getMarque(fields[1]);
+                String bonusMalus = getBonus(fields[3]);
+                String rejetsC02 = fields[4].trim();
+                String coutEnergie = getCout(fields[5]);
+
+                String attributs = bonusMalus + "," + rejetsC02 + "," + coutEnergie;
+                this.outputKey.set(marqueModele);
+                this.outputValue.set(new Text(attributs));
+                context.write(this.outputKey, this.outputValue);
+            }
+            
+        }
+
+        private String getMarque(String marqueModele) {
+            if (marqueModele.contains(" ")) {
                 String marque = marqueModele.split(" ")[0];
+                marque = marque.replace("\"", "");
+                LOG.info("===========> Marque : " + marque);
+                return marque;
+            }
+            return marqueModele;
+        }
     
-                String bonusMalus = cleanBonusMalus(fields[2].trim());
-                String emissionCO2 = cleanEmissionCO2(fields[3].trim());
-                String coutEnergie = cleanCoutEnergie(fields[4].trim());
-    
-                String outputValue = bonusMalus + "," + emissionCO2 + "," + coutEnergie;
-                context.write(new Text(marque), new Text(outputValue));
+        private String getBonus(String bonusInput) {
+            if (bonusInput.equalsIgnoreCase("-")) return "0";
+            try {
+                byte[] bytes = bonusInput.getBytes("UTF-8");
+                bonusInput = new String(bytes, "UTF-8");
+                bonusInput = bonusInput.replaceAll("€ 1", "").replaceAll("\\s+", "").replaceAll("€", "");
+                bonusInput = garderNombre(bonusInput);
+                LOG.info("===========> Bonus : " + bonusInput);
+                return bonusInput;
+            } catch (UnsupportedEncodingException e) {
+                return "-1";
             }
         }
-    
-        private String cleanBonusMalus(String input) {
-            String cleanedValue = input.split("€")[0].replaceAll("[+ \\u00A0]", "");
-            return cleanedValue.equals("-") ? "0" : cleanedValue;
+
+        private String getCout(String coutInput) {
+            try {
+                byte[] bytes = coutInput.getBytes("UTF-8");
+                coutInput = new String(bytes, "UTF-8");
+                coutInput = coutInput.replaceAll("€", "").replaceAll(" ", "").replaceAll("\\s", "").replaceAll("\\?", "").replaceAll("\\u00A0", "");
+                coutInput = garderChiffres(coutInput);
+                LOG.info("===========> Cout final : " + coutInput);
+                return coutInput;
+            } catch (UnsupportedEncodingException e) {
+                return "-1";
+            }
         }
-    
-        private String cleanEmissionCO2(String input) {
-            return input.replaceAll("[+ \\u00A0]", "");
+
+        public static String garderChiffres(String texte) {
+            Pattern pattern = Pattern.compile("\\D*(\\d+)\\D*");
+            Matcher matcher = pattern.matcher(texte);
+
+            StringBuilder chiffres = new StringBuilder();
+            
+            while (matcher.find()) {
+                chiffres.append(matcher.group(1));
+            }
+
+            return chiffres.toString();
         }
-    
-        private String cleanCoutEnergie(String input) {
-            return input.split("€")[0].replaceAll("[+ \\u00A0]", "");
+
+        public static String garderNombre(String texte) {
+            Pattern pattern = Pattern.compile("[-+]?\\d*\\.?\\d+");
+            Matcher matcher = pattern.matcher(texte);
+            
+            StringBuilder chiffres = new StringBuilder();
+            
+            while (matcher.find()) {
+                chiffres.append(matcher.group());
+            }
+            return chiffres.toString();
         }
     }
 
     //Classe Reducer CO2
     public static class CO2Reducer extends Reducer<Text, Text, Text, Text> {
+        private Text newValue = new Text();
+
         public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
-            List<String> modelesEtDetails = new ArrayList<>();
-            Map<String, double[]> marqueStats = new HashMap<>();
-    
-            for (Text value : values) {
-                String[] fields = value.toString().split(",");
-                if (fields.length >= 4) {
-                    String marqueModele = fields[0];
-                    String marque = marqueModele.split(" ")[0];
-                    double emissionCO2 = Double.parseDouble(fields[1]);
-                    double bonusMalus = Double.parseDouble(fields[2].replaceAll("[^0-9.-]", ""));
-                    double coutEnergie = Double.parseDouble(fields[3]);
-    
-                    double[] stats = marqueStats.getOrDefault(marque, new double[3]);
-                    stats[0] += bonusMalus;
-                    stats[1] += emissionCO2;
-                    stats[2] += coutEnergie;
-                    marqueStats.put(marque, stats);
-    
-                    modelesEtDetails.add(marqueModele);
+            double sumBonusMalus = 0;
+            double sumRejet = 0;
+            double sumCout = 0;
+        
+            int taille = 0;
+        
+            String[] fields = new String[0];
+            for (Text val : values) {
+                fields = val.toString().split(",");
+                if(fields.length == 3) {
+                    String cleanedBonusMalus = fields[0].trim().replaceAll("\\s+", "");
+                    String cleanedRejet = fields[1].trim().replaceAll("\\s+", "");
+                    String cleanedCout = fields[2].trim().replaceAll("\\s+", "");
+        
+                    sumBonusMalus += Double.parseDouble(cleanedBonusMalus);
+                    sumRejet += Double.parseDouble(cleanedRejet);
+                    sumCout += Double.parseDouble(cleanedCout);
                 }
+                taille++;
             }
-    
-            for (Map.Entry<String, double[]> entry : marqueStats.entrySet()) {
-                String marque = entry.getKey();
-                double[] stats = entry.getValue();
-                int count = modelesEtDetails.stream().filter(m -> m.startsWith(marque)).mapToInt(m -> 1).sum();
-                double avgBonusMalus = stats[0] / count;
-                double avgEmissionCO2 = stats[1] / count;
-                double avgCoutEnergie = stats[2] / count;
-    
-                context.write(new Text(marque), new Text(String.format("%s,%.2f,%.2f,%.2f", marque, avgBonusMalus, avgEmissionCO2, avgCoutEnergie)));
-            }
+        
+            double[] theValue = new double[3];
+            theValue[0]  = taille!= 0? sumBonusMalus / (double) taille : 0;
+            theValue[1]  = taille!= 0? sumRejet / (double) taille : 0;
+            theValue[2]  = taille!= 0? sumCout / (double) taille : 0;
+            
+            DecimalFormat df = new DecimalFormat("#.00");
+
+            String newV = df.format(theValue[0]).concat(",").concat(df.format(theValue[1])).concat(",").concat(df.format(theValue[2]));
+            this.newValue.set(newV);
+            
+            context.write(key, this.newValue);
         }
+        
     }
 
     public static void main(String[] args) throws Exception {
-        Configuration conf = new Configuration();
-        Job job = Job.getInstance(conf, "CO2 Data Integration");
+        if (args.length != 2) {
+            System.err.println("Usage: CO2Driver <input path> <output path>");
+            System.exit(-1);
+        }
+
+        Job job = Job.getInstance();
         job.setJarByClass(Co2.class);
-    
+        job.setJobName("CO2 Calculator");
+
         job.setMapperClass(CO2Mapper.class);
         job.setReducerClass(CO2Reducer.class);
-    
+
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(Text.class);
-    
+
         FileInputFormat.addInputPath(job, new Path(args[0]));
         FileOutputFormat.setOutputPath(job, new Path(args[1]));
-    
+
         System.exit(job.waitForCompletion(true) ? 0 : 1);
     }
 }
