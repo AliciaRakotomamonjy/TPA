@@ -24,7 +24,7 @@ STORED AS TEXTFILE;
 
 # migration des donnees
 ```bash
-LOAD DATA LOCAL INPATH '/vagrant/Tpa/clients_18.csv' OVERWRITE INTO TABLE CLIENTS;
+LOAD DATA LOCAL INPATH '/vagrant/Clients_18.csv' OVERWRITE INTO TABLE CLIENTS;
 ```
 # verifier les donnees
 ```bash
