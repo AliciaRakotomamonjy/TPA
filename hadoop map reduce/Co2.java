@@ -151,7 +151,7 @@ public class Co2 {
             
             DecimalFormat df = new DecimalFormat("#.00");
 
-            String newV = ",".concat(df.format(theValue[0])).concat(",").concat(df.format(theValue[1])).concat(",").concat(df.format(theValue[2]));
+            String newV = df.format(theValue[0]).concat(",").concat(df.format(theValue[1])).concat(",").concat(df.format(theValue[2]));
             this.newValue.set(newV);
             
             context.write(key, this.newValue);
@@ -174,6 +174,8 @@ public class Co2 {
 
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(Text.class);
+
+        job.getConfiguration().set("mapreduce.output.textoutputformat.separator", ",");
 
         FileInputFormat.addInputPath(job, new Path(args[0]));
         FileOutputFormat.setOutputPath(job, new Path(args[1]));
