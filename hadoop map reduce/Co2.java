@@ -151,7 +151,7 @@ public class Co2 {
             
             DecimalFormat df = new DecimalFormat("#.00");
 
-            String newV = df.format(theValue[0]).concat(",").concat(df.format(theValue[1])).concat(",").concat(df.format(theValue[2]));
+            String newV = ",".concat(df.format(theValue[0])).concat(",").concat(df.format(theValue[1])).concat(",").concat(df.format(theValue[2]));
             this.newValue.set(newV);
             
             context.write(key, this.newValue);

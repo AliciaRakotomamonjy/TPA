@@ -1,6 +1,12 @@
 # Hadoop Map Reduce : Traitement du fichier CO2.csv
 
 ## Intégration du fichier CO2.csv dans HDFS
+
+> Si HDFS n'est pas encore allumé il faudrait avec cette commande 
+
+```bash
+$ start-dfs.sh
+```
 > Le fichier CO2.csv est mis au préalable dans le répertoire de la VM
 
 ```bash
@@ -68,9 +74,9 @@ MARQUE string,
 `COUTENERGIE` DECIMAL(10,2)
 )
 ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
-STORED AS TEXTFILE LOCATION 'hdfs:/co2_treatment'
-TBLPROPERTIES (
-'skip.header.line.count'='1');
+STORED AS TEXTFILE;
+
+> LOAD DATA INPATH 'co2_treatment/*' OVERWRITE INTO TABLE CO2_HDFS_H_EXT;
 ```
 
 ### Vérification de la présence de données 
@@ -84,11 +90,11 @@ TBLPROPERTIES (
 
 > Création de view CATALOGUE_WITH_CO2_WITH_EMPTY avec les données null
 ```bash
-> CREATE VIEW CATALOGUE_WITH_CO2_WITH_EMPTY AS
+> CREATE VIEW IF NOT EXISTS CATALOGUE_WITH_CO2_WITH_EMPTY AS
 SELECT c.id, c.marque, c.nom, c.puissance, c.longueur, c.nbplaces, c.nbportes, c.couleur, c.occasion, c.prix, 
        co2.`BONUS/MALUS`, co2.`REJETCO2`, co2.`COUTENERGIE`
 FROM CATALOGUE_MDB_EXT c
-LEFT JOIN CO2_HDFS_H_EXT co2 ON c.marque = co2.MARQUE;
+LEFT JOIN CO2_HDFS_H_EXT co2 ON UPPER(c.marque) = UPPER(co2.MARQUE);
 ```
 > Vérification des données
 ```bash
@@ -96,7 +102,7 @@ LEFT JOIN CO2_HDFS_H_EXT co2 ON c.marque = co2.MARQUE;
 ```
 > Création de view CATALOGUE_WITH_CO2 qui gère les données null
 ```bash
-> CREATE VIEW CATALOGUE_WITH_CO2 AS
+> CREATE VIEW IF NOT EXISTS CATALOGUE_WITH_CO2 AS
 SELECT id, marque, nom, puissance, longueur, nbplaces, nbportes, couleur, occasion, prix,
        CASE
            WHEN `BONUS/MALUS` IS NOT NULL AND `REJETCO2` IS NOT NULL AND `COUTENERGIE` IS NOT NULL
