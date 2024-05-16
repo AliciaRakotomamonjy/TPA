@@ -2,6 +2,15 @@
 
 ## Migration du fichier Immatriculations.csv dans HDFS
 
+### Démarrage de Hadoop HDFS
+
+start-dfs.sh
+
+### Démarrage du serveur Hadoop HIVE
+
+nohup hive --service metastore > /dev/null &
+nohup hiveserver2 > /dev/null &
+
 ### Création d'un directory `immatriculations`
 ```bash
 $ hdfs dfs -mkdir /immatriculations
