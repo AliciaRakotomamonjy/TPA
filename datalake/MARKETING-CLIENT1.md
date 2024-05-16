@@ -1,19 +1,19 @@
 # Lancement de de Kvstore :
  
-> nohup java -Xmx256m -Xms256m -jar $KVHOME/lib/kvstore.jar kvlite -secure-config disable -root $KVROOT > kvstore.log 2>&1 &
+nohup java -Xmx256m -Xms256m -jar $KVHOME/lib/kvstore.jar kvlite -secure-config disable -root $KVROOT > kvstore.log 2>&1 &
 
 # Copie des fichiers Java dans le répertoire de Kvstore :
->cp /vagrant/MigrationKvstore.java $KVHOME/examples/hello
->cp /vagrant/Marketing.java $KVHOME/examples/hello
+cp /vagrant/ClientMarketing.java $KVHOME/examples/hello
+
 
 # Compilation des classes Java :
->mkdir migrationKv
->javac /$KVHOME/examples/hello/MigrationKvstore.java -d migrationKv
->javac /$KVHOME/examples/hello/Marketing.java -d migrationKv
+mkdir migrationKv
+javac /$KVHOME/examples/hello/ClientMarketing.java -d migrationKv
+
 
 # Exécution des ETL 
->java -cp $CLASSPATH:migrationKv MigrationKvstore
->java -cp $CLASSPATH:migrationKv Marketing
+>java -cp $CLASSPATH:migrationKv ClientMarketing
+
 
 # On se connecte a HIVE
 >beeline -u jdbc:hive2://localhost:10000
