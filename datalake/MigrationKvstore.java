@@ -57,7 +57,7 @@ public class MigrationKvstore {
                 
                 String[] values = line.split(",");
                 System.out.println("eto"+values[0].trim());
-                if (values[0].trim()=="") {
+                if (values[0].trim()==" ") {
                     continue; // Passer à la ligne suivante sans traiter la première ligne
                 }
                 Row row = tableAPI.getTable("CLIENT").createRow();
