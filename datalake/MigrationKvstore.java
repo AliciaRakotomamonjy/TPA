@@ -44,37 +44,49 @@ public class MigrationKvstore {
         // Lecture du fichier CSV et insertion des données dans la table CLIENT
         try {
             List<String> lines = Files.readAllLines(Paths.get(csvFilePath), StandardCharsets.UTF_8);
-        
-            // Définir une variable booléenne pour suivre si nous sommes à la première ligne ou non
+
+            // Définir une variable booléenne pour suivre si nous sommes à la première ligne
+            // ou non
             boolean isFirstLine = true;
-        
+
             for (String line : lines) {
                 // Vérifier si nous sommes à la première ligne
                 if (isFirstLine) {
                     isFirstLine = false; // Marquer que nous avons déjà passé la première ligne
                     continue; // Passer à la ligne suivante sans traiter la première ligne
                 }
-                
+
                 String[] values = line.split(",");
-                System.out.println("eto"+values[0].trim());
-                if (values[0].trim()=="") {
-                    continue; // Passer à la ligne suivante sans traiter la première ligne
+                System.out.println("eto" + values[0].trim());
+
+                try {
+                    Row row = tableAPI.getTable("CLIENT").createRow();
+                    row.put("AGE", Integer.parseInt(values[0].trim()));
+                    row.put("SEXE", values[1].trim());
+                    row.put("TAUX", Integer.parseInt(values[2].trim()));
+                    row.put("SITUATIONFAMILIALE", values[3].trim());
+                    row.put("NBENFANTSACHARGE", Integer.parseInt(values[4].trim()));
+                    row.put("DEUXIEMEVOITURE", Boolean.parseBoolean(values[5].trim()));
+                    row.put("IMMATRICULATION", values[6].trim());
+                    tableAPI.put(row, null, null);
+
+                } catch (NumberFormatException e) {
+                    continue;
                 }
-                Row row = tableAPI.getTable("CLIENT").createRow();
-                row.put("AGE", Integer.parseInt(values[0].trim()));
-                row.put("SEXE", values[1].trim());
-                row.put("TAUX", Integer.parseInt(values[2].trim()));
-                row.put("SITUATIONFAMILIALE", values[3].trim());
-                row.put("NBENFANTSACHARGE", Integer.parseInt(values[4].trim()));
-                row.put("DEUXIEMEVOITURE", Boolean.parseBoolean(values[5].trim()));
-                row.put("IMMATRICULATION", values[6].trim());
-                tableAPI.put(row, null, null);
+                // Row row = tableAPI.getTable("CLIENT").createRow();
+                // row.put("AGE", Integer.parseInt(values[0].trim()));
+                // row.put("SEXE", values[1].trim());
+                // row.put("TAUX", Integer.parseInt(values[2].trim()));
+                // row.put("SITUATIONFAMILIALE", values[3].trim());
+                // row.put("NBENFANTSACHARGE", Integer.parseInt(values[4].trim()));
+                // row.put("DEUXIEMEVOITURE", Boolean.parseBoolean(values[5].trim()));
+                // row.put("IMMATRICULATION", values[6].trim());
+                // tableAPI.put(row, null, null);
             }
             System.out.println("Données insérées avec succès dans la table CLIENT.");
         } catch (IOException e) {
             e.printStackTrace();
         }
-        
 
         // Fermeture de la connexion au Kvstore
         kvstore.close();
