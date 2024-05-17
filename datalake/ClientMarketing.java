@@ -75,7 +75,7 @@ public class ClientMarketing {
         clm.createTableMarketing();
         clm.loadClientDataFromFile(mainPath+"/Clients_1.csv");
         clm.loadMarketingDataFromFile(mainPath+"/Marketing.csv");
-		sSystem.out.println("Vita Paps ah");
+		System.out.println("Vita Paps ah");
     }
 
     /**

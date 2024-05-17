@@ -40,7 +40,6 @@ TBLPROPERTIES (
 "oracle.kv.tableName" = "CLIENT");
 
 CREATE EXTERNAL TABLE MARKETING_KV_H_EXT(
-    IDMARKETING int,
     AGE int, 
     SEXE string, 
     TAUX int, 
@@ -55,7 +54,7 @@ TBLPROPERTIES (
 "oracle.kv.tableName" = "MARKETING");
 
 # Test des donnees insérées
-select * from MARKETING_KV_H_EXT limit 100;
+select * from MARKETING_KV_H_EXT limit 10;
 
 
 
