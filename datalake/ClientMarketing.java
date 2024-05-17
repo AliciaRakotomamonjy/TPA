@@ -75,6 +75,7 @@ public class ClientMarketing {
         clm.createTableMarketing();
         clm.loadClientDataFromFile(mainPath+"/Clients_1.csv");
         clm.loadMarketingDataFromFile(mainPath+"/Marketing.csv");
+		sSystem.out.println("Vita Paps ah");
     }
 
     /**
@@ -115,23 +116,36 @@ public class ClientMarketing {
 				while(val.hasMoreTokens()) { 
 						clientRecord.add(val.nextToken().toString()); 
 				}
-				Integer age = null;
+				Integer age = 0;
 				
 				try {
-					 age		= Integer.parseInt(clientRecord.get(0));
+					 age = Integer.parseInt(clientRecord.get(0));
 				}catch(Exception e){
 
 				}
 				
 				String sexe		= clientRecord.get(1);
-				int taux		= Integer.parseInt(clientRecord.get(2));
+				
+				int taux = 0;
+				try {
+					System.out.println("taux "+clientRecord.get(2));
+					 taux = Integer.parseInt(clientRecord.get(2));
+			   }catch(Exception e){
+				
+			   }
 				String situationFamiliale	= clientRecord.get(3);
-				int nbEnfantsACharge		= Integer.parseInt(clientRecord.get(4));
+				int nbEnfantsACharge = 0;
+				try{
+					nbEnfantsACharge		= Integer.parseInt(clientRecord.get(4));
+				}catch(Exception e){
+
+				}
+				
 				boolean deuxiemeVoiture		= Boolean.parseBoolean(clientRecord.get(5));
 				String immatriculation	= clientRecord.get(6);
-				System.out.println("age="+age+" sexe="+sexe+" taux="+taux
-				+" situationFamiliale="+situationFamiliale+" nbEnfantsACharge="+nbEnfantsACharge+" deuxiemeVoiture="+deuxiemeVoiture
-				+" immatriculation="+immatriculation);
+				// System.out.println("age="+age+" sexe="+sexe+" taux="+taux
+				// +" situationFamiliale="+situationFamiliale+" nbEnfantsACharge="+nbEnfantsACharge+" deuxiemeVoiture="+deuxiemeVoiture
+				// +" immatriculation="+immatriculation);
 				// Add the client in the KVStore
 				this.insertAClientRow(immatriculation,age,sexe,taux,situationFamiliale,nbEnfantsACharge,deuxiemeVoiture);
 			}
@@ -155,7 +169,7 @@ public class ClientMarketing {
 		
 		// Variables pour stocker les données lues d'un fichier. 
 		String 		ligne; 
-		System.out.println("********************************** Dans : loadClientDataFromFile *********************************" );
+		System.out.println("********************************** Dans : loadMarketingDataFromFile *********************************" );
 		
 		/* parcourir les lignes du fichier texte et découper chaque ligne */
 		try {
