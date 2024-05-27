@@ -75,7 +75,6 @@ public class ClientMarketing {
         clm.createTableMarketing();
         clm.loadClientDataFromFile(mainPath+"/Clients_1.csv");
         clm.loadMarketingDataFromFile(mainPath+"/Marketing.csv");
-		System.out.println("Vita Paps ah");
     }
 
     /**
@@ -128,11 +127,8 @@ public class ClientMarketing {
 				
 				int taux = 0;
 				try {
-					System.out.println("taux "+clientRecord.get(2));
-					 taux = Integer.parseInt(clientRecord.get(2));
-			   }catch(Exception e){
-				
-			   }
+					taux = Integer.parseInt(clientRecord.get(2));
+			   	}catch(Exception e){}
 				String situationFamiliale	= clientRecord.get(3);
 				int nbEnfantsACharge = 0;
 				try{
@@ -143,9 +139,9 @@ public class ClientMarketing {
 				
 				boolean deuxiemeVoiture		= Boolean.parseBoolean(clientRecord.get(5));
 				String immatriculation	= clientRecord.get(6);
-				// System.out.println("age="+age+" sexe="+sexe+" taux="+taux
-				// +" situationFamiliale="+situationFamiliale+" nbEnfantsACharge="+nbEnfantsACharge+" deuxiemeVoiture="+deuxiemeVoiture
-				// +" immatriculation="+immatriculation);
+				System.out.println("age="+age+" sexe="+sexe+" taux="+taux
+				+" situationFamiliale="+situationFamiliale+" nbEnfantsACharge="+nbEnfantsACharge+" deuxiemeVoiture="+deuxiemeVoiture
+				+" immatriculation="+immatriculation);
 				// Add the client in the KVStore
 				this.insertAClientRow(immatriculation,age,sexe,taux,situationFamiliale,nbEnfantsACharge,deuxiemeVoiture);
 			}
