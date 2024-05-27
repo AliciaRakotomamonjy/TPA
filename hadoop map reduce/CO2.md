@@ -17,6 +17,11 @@ $ hadoop fs -put /vagrant/CO2.csv .
 ```bash
 $ hadoop fs -ls
 ```
+**Voici le résultat:**
+```
+Found 1 items
+-rw-r--r--   1 vagrant supergroup      38916 2024-05-27 08:12 CO2.csv
+```
 
 ## Compilation du script map/reduce et construction du fichier jar
 
@@ -55,6 +60,33 @@ $ hadoop jar co2-0.0.1.jar org.mbds.Co2 CO2.csv co2_treatment
 $ hadoop fs -cat co2_treatment/*
 ```
 
+**Voici le résultat:**
+```
+AUDI,-24000.40,26.10,191.60
+BENTLEY,.00,84.00,102.00
+BMW,-6315.89,39.26,80.53
+CITROEN,-60001.00,.00,347.00
+DS,-30000.50,16.50,159.00
+HYUNDAI,-40000.67,8.67,151.00
+JAGUAR,-60001.00,.00,271.00
+KIA,-40000.67,10.33,157.67
+LAND,.00,69.00,78.00
+MERCEDES,7241.42,187.63,749.98
+MINI,-30000.50,21.50,126.00
+MITSUBISHI,.00,40.00,98.00
+NISSAN,-4997.80,160.00,681.20
+PEUGEOT,-30000.50,15.83,144.17
+PORSCHE,.00,69.86,89.71
+RENAULT,-60001.00,.00,206.00
+SKODA,-6666.78,27.56,98.89
+SMART,-60001.00,.00,191.36
+TESLA,-60001.00,.00,245.89
+TOYOTA,.00,32.00,43.00
+VOLKSWAGEN,-17143.14,23.43,96.00
+VOLVO,.00,42.45,72.73
+```
+
+
 ## Intégration des données dans HIVE
 
 ### Démarrage du serveur Hadoop HIVE 
@@ -92,6 +124,18 @@ STORED AS TEXTFILE;
 
 ```bash
 > SELECT COUNT(*) FROM CO2_HDFS_H_EXT;
+```
+
+**Voici le résultat:**
+```
++------+
+| _c0  |
++------+
+| 22   |
++------+
+```
+
+```bash
 > SELECT * FROM CO2_HDFS_H_EXT LIMIT 5;
 ```
 
