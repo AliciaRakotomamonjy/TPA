@@ -30,6 +30,7 @@ Found 1 items
 ### Compilation du code map reduce
 
 ```bash
+$ cd /vagrant
 $ javac Co2.java
 $ mkdir -p org/mbds
 $ mv Co2*.class org/mbds
