@@ -95,6 +95,11 @@ mongo
 > db.catalogues.drop()
 ```
 
+Pour quitter mongo, on excécute la commande exit
+```bash
+> exit
+```
+
 ## import du fichier Catalogue.csv dans mongodb
 ```bash
 tail -n +2 /vagrant/Catalogue.csv | mongoimport \
