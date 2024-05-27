@@ -6,7 +6,7 @@ $ tail -n +2 /vagrant/Catalogue.csv | mongoimport \
 --collection='catalogues' \
 --type=csv \
 --columnsHaveTypes \
---fields="marque.string(),nom.string(),puissance.int32(),longueur.string(),nbPlaces.int32(),nbPortes.int32(),couleur.string(),occasion.boolean(),prix.int32()"
+--fields="marque.string(),nom.string(),puissance.int32(),longueur.string(),nbplaces.int32(),nbportes.int32(),couleur.string(),occasion.boolean(),prix.int32()"
 ```
 Le résultat de la commande devrait afficher 
 - "connected to: localhost"

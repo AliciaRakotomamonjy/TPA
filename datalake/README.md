@@ -95,7 +95,7 @@ tail -n +2 /vagrant/Catalogue.csv | mongoimport \
 --collection='catalogues' \
 --type=csv \
 --columnsHaveTypes \
---fields="marque.string(),nom.string(),puissance.int32(),longueur.string(),nbPlaces.int32(),nbPortes.int32(),couleur.string(),occasion.boolean(),prix.int32()"
+--fields="marque.string(),nom.string(),puissance.int32(),longueur.string(),nbplaces.int32(),nbportes.int32(),couleur.string(),occasion.boolean(),prix.int32()"
 ```
 
 Pour vérifier si les données sont bien présents dans mongodb
@@ -114,6 +114,11 @@ Pour quitter mongo, on excécute la commande exit
 ## Connexion à HIVE
 ```bash
 beeline -u jdbc:hive2://localhost:10000
+```
+
+## Suppression de la table si elle existe déjà
+```bash
+jdbc:hive2://localhost:10000> DROP TABLE CATALOGUE_MDB_EXT;
 ```
 
 ## Création de la table externe pointant vers la table catalogues dans mongodb
