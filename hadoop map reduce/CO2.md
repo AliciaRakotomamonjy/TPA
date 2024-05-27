@@ -57,6 +57,15 @@ $ hadoop fs -cat co2_treatment/*
 
 ## Intégration des données dans HIVE
 
+### Démarrage du serveur Hadoop HIVE 
+
+> Démarrage du serveur hadoop HIVe au cas où celui-ci n'est pas encore allumé
+
+```bash
+nohup hive --service metastore > /dev/null &
+nohup hiveserver2 > /dev/null &
+```
+
 ### Connexion à beeline puis HIVE
 
 ```bash
