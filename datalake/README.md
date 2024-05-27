@@ -88,6 +88,13 @@ jdbc:hive2://localhost:10000> select count(*) from CLIENT_KV_H_EXT;
 sudo systemctl start mongod
 ```
 
+## Suppression de la table catalogue s'il existe déjà
+```bash
+mongo
+> use automobile
+> db.catalogues.drop()
+```
+
 ## import du fichier Catalogue.csv dans mongodb
 ```bash
 tail -n +2 /vagrant/Catalogue.csv | mongoimport \
