@@ -161,14 +161,83 @@ catalogue$`longueur` <- factor(catalogue$`longueur`, levels = c("courte", "moyen
 
 # Vérification de la corrélation entre les variables 
 
-catalogue$longueur <- as.numeric(catalogue$longueur)
-catalogue$nbplaces <- as.numeric(as.character(catalogue$nbplaces))
-catalogue$nbportes <- as.numeric(as.character(catalogue$nbportes))
-catalogue$couleur <- as.numeric(catalogue$couleur)
-catalogue$occasion <- ifelse(catalogue$occasion == "true", 1, 0)
-catalogue$marque <- as.numeric(catalogue$marque)
-catalogue$nom <- as.numeric(catalogue$nom)
-
-pairs(catalogue)
+pairs(catalogue[,c("longueur", "puissance", "prix", "nbplaces", "nbportes", "couleur", "marque", "occasion")])
 
 # Résultats : Il n'y a pas de motif clair dans les diagrammes de dispersion impliquant la couleur. Cela suggère que la couleur n'a pas d'impact significatif sur les autres variables.
+
+# Enlever la variable couleur 
+
+catalogueTraitement <- catalogue
+catalogueTraitement$couleur <- NULL 
+str(catalogueTraitement)
+
+# Utilisation de K-means en variant le nombre de cluster 
+
+install.packages("cluster")
+library(cluster)
+
+dataMatrix <- daisy(catalogueTraitement)
+summary(dataMatrix)
+
+install.packages("tsne")
+library(tsne)
+
+tsne_out <- tsne(dataMatrix, k=2)
+tsne_out <- data.frame(tsne_out)
+set.seed(10000)
+
+for(k in 2:10) {
+  km <- kmeans(dataMatrix, k)
+  print(qplot(tsne_out[,1], tsne_out[,2], col=as.factor(km$cluster)))
+}
+
+# Résultats : K=6 : Données mieux séparées et détaillées, facilitation de l'analyse 
+
+# Evaluation du nombre de cluster choisi K=6
+
+kmeans6 <- kmeans(dataMatrix, 6)
+
+qplot(longueur, as.factor(kmeans6$cluster), data=catalogueTraitement) + geom_jitter(width = 0.3, height = 0.3)
+qplot(puissance, as.factor(kmeans6$cluster), data=catalogueTraitement) + geom_jitter(width = 0.3, height = 0.3)
+qplot(nbportes, as.factor(kmeans6$cluster), data=catalogueTraitement) + geom_jitter(width = 0.3, height = 0.3)
+qplot(nbplaces, as.factor(kmeans6$cluster), data=catalogueTraitement) + geom_jitter(width = 0.3, height = 0.3)
+qplot(prix, as.factor(kmeans6$cluster), data=catalogueTraitement) + geom_jitter(width = 0.3, height = 0.3)
+qplot(occasion, as.factor(kmeans6$cluster), data=catalogueTraitement) + geom_jitter(width = 0.3, height = 0.3)
+
+# Interprétation pour k=6 => Catégorisation des véhicules
+# Cluster 1 :
+# Interprétation : Voitures Citadines
+# Caractéristiques : Petite taille, économie de carburant
+
+# Cluster 2 :
+# Interprétation : Véhicules de Luxe / Haut de Gamme
+# Caractéristiques : Prix élevé, haute technologie
+
+# Cluster 3 :
+
+# Interprétation : SUV
+# Caractéristiques : Garde au sol élevée, espace intérieur, polyvalence
+# La dispersion suggère une large gamme : du compact au grand luxe
+
+# Cluster 4 :
+
+# Interprétation : Voitures Familiales
+# Caractéristiques : Espace, confort, équilibre performance/économie
+
+# Cluster 5 :
+
+# Interprétation : Voitures de Sport
+# Caractéristiques : Puissance élevée, maniabilité, design aérodynamique
+# Proche du cluster Luxe, suggérant un chevauchement (pensez supercars)
+
+
+# Cluster 6 :
+
+# Interprétation : Véhicules Hybrides / Électriques
+# Caractéristiques : Faibles émissions, nouvelles technologies, efficacité
+# Au centre, suggérant des caractéristiques partagées avec d'autres catégories
+
+# Ajout colonne catégorie dans les données du catalogue 
+
+catalogue$categorie <- factor(kmeans6$cluster, levels=c(1,2,3,4,5,6), labels=c("Voitures Citadines", "Véhicules de Luxe / Haut de Gamme", "SUV", "Voitures Familiales", "Voitures de Sport", "Véhicules Hybrides / Électriques"))
+table(catalogue$categorie)
