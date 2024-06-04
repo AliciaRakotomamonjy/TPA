@@ -67,7 +67,7 @@ library(ggplot2)
 
 # Répartition des données de la colonne longueur 
 
-if (max(catalogue$longueur, na.rm = TRUE) > 100) {
+if (max(as.numeric(catalogue$longueur) , na.rm = TRUE) > 100) {
   catalogue$longueur <- catalogue$longueur / 1000
   unite <- "m"
 } else {
@@ -241,3 +241,39 @@ qplot(occasion, as.factor(kmeans6$cluster), data=catalogueTraitement) + geom_jit
 
 catalogue$categorie <- factor(kmeans6$cluster, levels=c(1,2,3,4,5,6), labels=c("Voitures Citadines", "Véhicules de Luxe / Haut de Gamme", "SUV", "Voitures Familiales", "Voitures de Sport", "Véhicules Hybrides / Électriques"))
 table(catalogue$categorie)
+
+# Copie du dataframe catalogue pour usage ultérieur
+catalogueNew <- catalogue
+
+# Etape 3 : Association des catégories aux immatriculations
+immatriculations <- dbGetQuery(conn, "select immatriculation, marque, nom, puissance, nbplaces, nbportes, longueur, couleur, occasion, prix from immatriculations_hdfs_h_ext")
+str(immatriculations)
+
+table(immatriculations$longueur)
+catalogue$prix <- NULL
+
+immatriculations$nbplaces <- factor(immatriculations$nbplaces,levels = c(5,7),ordered = TRUE)
+immatriculations$longueur <- factor(immatriculations$`longueur`, levels = c("courte", "moyenne", "longue", "tr�s longue"), ordered = TRUE)
+immatriculations$nbportes <- factor(immatriculations$nbportes,ordered = TRUE)
+
+library(dplyr)
+joined_immatriculations_catalogue <- inner_join(immatriculations,catalogue,by= c("nbplaces","marque","nom","puissance","longueur","nbportes","couleur","occasion"))
+str(joined_immatriculations_catalogue)
+count(joined_immatriculations_catalogue)
+
+table(joined_immatriculations_catalogue$categorie)
+qplot(categorie,data = catalogue)
+
+# Etape 4 : Fusion clients et immatriculations
+
+joined_immatriculations_catalogue <- joined_immatriculations_catalogue[!duplicated(joined_immatriculations_catalogue$immatriculation),]
+
+clients <- dbGetQuery(conn, "select immatriculation, age, sexe, taux, situationfamiliale, nbenfantsacharge, deuxiemevoiture from clients_union");
+str(clients)
+
+newDfClients <- merge(x = clients, y = joined_immatriculations_catalogue, by = "immatriculation",all.x = T)
+str(newDfClients)
+
+# Diagramme des effectifs des categories
+qplot(categorie, data = newDfClients,main = "Distributions des catégories sur les clients")
+
