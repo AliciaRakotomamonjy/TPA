@@ -44,4 +44,19 @@ ggplot(clients, aes(x = clients.sexe)) +
   theme_minimal()
 
 
+# 3. Deuxième voiture
+# Afficher la table des fréquences de deuxième voiture pour identifier les valeurs incohérentes
+table(clients$clients.deuxiemevoiture)
+
+# Suppression des champs non-renseignés
+clients <- clients[!is.na(clients$clients.deuxiemevoiture), ]
+
+# Création de raphique de visualisation
+ggplot(clients, aes(x="true", y="false", fill=clients.deuxiemevoiture)) +
+  geom_bar(width = 1, stat = "identity") +
+  coord_polar("y", start=0) +
+  theme_void() +
+  theme(legend.position="right") +
+  labs(fill="Deuxième voiture")
+
 
