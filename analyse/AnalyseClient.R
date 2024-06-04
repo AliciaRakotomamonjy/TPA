@@ -75,3 +75,22 @@ ggplot(clients) +
   geom_bar(aes(y = clients.nbenfantsacharge), fill = "light blue", color = "black")+
   labs(title = "Distribution du nombre d'enfants à charge", x = "Fréquence", y = "Enfants à charge")+
   theme_minimal()
+
+# 5. Situation familiale
+table(clients$clients.situationfamiliale)
+
+# Rassembler les valeurs similaires de `clients.situationfamiliale`
+clients$clients.situationfamiliale <- ifelse(clients$clients.situationfamiliale %in% c("C�libataire", "Seul", "Seule", "Divorc�e"), "Celibataire",
+                               ifelse(clients$clients.situationfamiliale %in% c("Mari�(e)", "En Couple"), "En couple",
+                                      clients$clients.situationfamiliale))
+
+# Supprimer les valeurs incohérentes "?","N/D","" et " " de la colonne `clients.situationfamiliale`
+clients <- clients %>% filter(clients.situationfamiliale != "?" & clients.situationfamiliale != "N/D" & clients.situationfamiliale != "" & clients.situationfamiliale != " ")
+
+# Visualisation des données
+ggplot(clients, aes(x="true", y="false", fill=clients.situationfamiliale)) +
+  geom_bar(width = 1, stat = "identity") +
+  coord_polar("y", start=0) +
+  theme_void() +
+  theme(legend.position="right") +
+  labs(fill="Situation familiale")
