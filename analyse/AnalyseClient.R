@@ -76,6 +76,7 @@ ggplot(clients) +
   labs(title = "Distribution du nombre d'enfants à charge", x = "Fréquence", y = "Enfants à charge")+
   theme_minimal()
 
+
 # 5. Situation familiale
 table(clients$clients.situationfamiliale)
 
@@ -94,3 +95,19 @@ ggplot(clients, aes(x="true", y="false", fill=clients.situationfamiliale)) +
   theme_void() +
   theme(legend.position="right") +
   labs(fill="Situation familiale")
+
+
+# 6. Taux d'endettement
+# Afficher la table des fréquences des taux pour identifier les valeurs incohérentes
+table(clients$clients.taux)
+
+# Supprimer les valeurs incohérentes (négatives) de la colonne `clients.situationfamiliale`
+clients <- clients %>% filter(clients.taux > 0)
+
+# Afficher un histogramme des fréquences
+
+ggplot(clients, aes(x = clients.taux, fill = clients.situationfamiliale)) +
+  geom_histogram(position="stack", binwidth = 150, color = "black") +
+  scale_fill_manual(values=c("light blue", "pink")) +
+  labs(title = "Distribution de la valeur de taux par situation familiale", x = "Valeur de taux", y = "Effectif") +
+  theme_minimal()
