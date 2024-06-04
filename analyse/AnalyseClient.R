@@ -60,3 +60,18 @@ ggplot(clients, aes(x="true", y="false", fill=clients.deuxiemevoiture)) +
   labs(fill="Deuxième voiture")
 
 
+# 4. Nombre d'enfant à charge
+# Afficher la table des fréquences du nombre d'enfant à charge pour identifier les valeurs incohérentes
+table(clients$clients.nbenfantsacharge)
+
+# Convertir la colonne `clients.nbenfantsacharge` en numérique, les valeurs non numériques seront converties en NA
+clients$clients.nbenfantsacharge <- as.numeric(as.character(clients$clients.nbenfantsacharge))
+
+# Supprimer les valeurs incohérentes (NA) et les valeurs négatives de la colonne `clients.age`
+clients <- clients[!is.na(clients$clients.nbenfantsacharge) & clients$clients.nbenfantsacharge >= 0, ]
+
+# Visualiser les données nettoyés
+ggplot(clients) +
+  geom_bar(aes(y = clients.nbenfantsacharge), fill = "light blue", color = "black")+
+  labs(title = "Distribution du nombre d'enfants à charge", x = "Fréquence", y = "Enfants à charge")+
+  theme_minimal()
