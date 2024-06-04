@@ -2,7 +2,8 @@
 # Charger les données de la table `clients` depuis la base de données
 clients <- dbGetQuery(conn, "SELECT * FROM clients")
 
-# Age
+
+# 1. Age
 # Afficher la structure des données
 str(clients)
 
@@ -21,4 +22,26 @@ ggplot(clients, aes(x = clients.age)) +
   labs(title = "Distribution des âges", x = "Âge", y = "Fréquence") +  # Ajouter des étiquettes et un titre
   scale_x_continuous(breaks = seq(0, max(clients$clients.age), by = 5)) +  # Ajouter des graduations pour l'axe des x
   scale_y_continuous(breaks = seq(0, max(table(clients$clients.age)), by = 10)) +  # Ajouter des graduations pour l'axe des y
-  theme_minimal()  # Appliquer un thème minimaliste
+  theme_minimal()
+
+
+# 2. Sexe
+# Afficher la table des fréquences des sexes pour identifier les valeurs incohérentes
+table(clients$clients.sexe)
+
+# Rassembler les valeurs similaires de `clients.sexe`
+clients$clients.sexe <- ifelse(clients$clients.sexe %in% c("Femme", "Féminin", "F�minin"), "F",
+                               ifelse(clients$clients.sexe %in% c("Masculin", "Homme"), "M",
+                                      clients$clients.sexe))
+
+# Supprimer les valeurs incohérentes "?","N/D","" et " " de la colonne `clients.sexe`
+clients <- clients %>% filter(clients.sexe != "?" & clients.sexe != "N/D" & clients.sexe != "" & clients.sexe != " ")
+
+# Créer un graphique pour visualiser la distribution des sexes
+ggplot(clients, aes(x = clients.sexe)) +
+  geom_bar(fill = "light blue", color = "black") +  # Utiliser geom_bar pour les variables discrètes
+  labs(title = "Distribution des sexes", x = "Sexe", y = "Fréquence")+   # Ajouter des étiquettes et un titre
+  theme_minimal()
+
+
+
