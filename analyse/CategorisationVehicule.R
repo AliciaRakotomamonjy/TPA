@@ -133,8 +133,8 @@ ggplot(catalogue, aes(x = nbplaces)) +
 ggplot(catalogue, aes(x = nbportes)) +
   geom_histogram(binwidth = 1, fill = "darkgrey", color = "black", alpha = 0.7) +
   geom_text(stat = "bin", aes(label =..count..), vjust = -0.5, size = 3, binwidth = 1) +
-  labs(title = "Répartition des Nombres de Places par Véhicule",
-       x = "Nombres de Places",
+  labs(title = "Répartition des Nombres de Portes par Véhicule",
+       x = "Nombres de Portes",
        y = "Fréquence") +
   theme_minimal() +
   theme(
