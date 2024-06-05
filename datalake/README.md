@@ -251,4 +251,11 @@ jdbc:hive2://localhost:10000> select count(*) from CLIENTS;
 +---------+
 ```
 
+# création d'une view pour combiner tous les clients
+```bash
+jdbc:hive2://localhost:10000> CREATE OR REPLACE VIEW CLIENTS_UNION as 
+ SELECT * from CLIENT_KV_H_EXT
+ UNION ALL
+ SELECT * FROM CLIENTS;
+```
 
