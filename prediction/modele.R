@@ -1,3 +1,21 @@
+library(RJDBC)
+hive_jdbc_jar <- "C:/Jar/hive-jdbc-3.1.3-standalone.jar" 
+hive_driver <- "org.apache.hive.jdbc.HiveDriver"
+
+hive_url <- "jdbc:hive2://localhost:10000"
+
+
+drv <- JDBC(hive_driver, hive_jdbc_jar)
+
+
+conn <- dbConnect(drv, hive_url, "vagrant", "")
+
+
+show_tables <- dbGetQuery(conn, "show tables")
+
+
+print(show_tables);
+
 # hive_jdbc_jar <- "F:/informatiqueMendrika/projectM2/hive/jar/hive-jdbc-3.1.3-standalone.jar" 
 
 # Etape 2 : Identification des catégories de véhicules
@@ -45,7 +63,7 @@ str(catalogue)
 library(ggplot2)
 
 # Répartition des données de la colonne puissance 
-  ggplot(catalogue, aes(x = catalogue$puissance)) +
+ggplot(catalogue, aes(x = catalogue$puissance)) +
   geom_histogram(binwidth = 20, fill = "darkgrey", color = "black", alpha = 0.7) +
   geom_text(stat = "bin", aes(label = ..count..), vjust = -0.5, size = 3, binwidth = 20) +
   labs(title = "Distribution Détaillée de la Puissance des Véhicules",
@@ -82,9 +100,9 @@ names(longueur_df) <- c("Longueur", "Fréquence")
 
 ggplot(longueur_df, aes(x = Longueur, y = Fréquence)) +
   geom_bar(stat = "identity", 
-          fill = "gray",  # Bleu uniforme
-          color = "gray",   # Bordure noire pour une meilleure visibilité
-          width = 0.7) +    # Largeur des barres à 70% pour un meilleur espacement
+           fill = "gray",  # Bleu uniforme
+           color = "gray",   # Bordure noire pour une meilleure visibilité
+           width = 0.7) +    # Largeur des barres à 70% pour un meilleur espacement
   labs(title = "Distribution de la Longueur des Véhicules",
        x = "",
        y = "Nombre de Véhicules") +
@@ -101,8 +119,8 @@ ggplot(longueur_df, aes(x = Longueur, y = Fréquence)) +
     plot.margin = unit(c(1, 1, 1, 1), "cm")  # Marges autour du graphique
   ) +
   scale_y_continuous(expand = c(0, 0), 
-                   limits = c(0, max(longueur_df$Fréquence) * 1.1),
-                   breaks = seq(0, max(longueur_df$Fréquence), by = 100))
+                     limits = c(0, max(longueur_df$Fréquence) * 1.1),
+                     breaks = seq(0, max(longueur_df$Fréquence), by = 100))
 
 # Résultats => aucune incohérence
 
@@ -148,7 +166,7 @@ ggplot(catalogue, aes(x = nbportes)) +
   ) +
   scale_x_continuous(breaks = seq(min(catalogue$nbportes, na.rm = TRUE), max(catalogue$nbportes, na.rm = TRUE) + 1, by = 1)) +
   scale_y_continuous(expand = c(0, 0))
-  
+
 
 # Mettre les colonnes nbPlaces, nbPortes, longueur en ordinal 
 
@@ -284,3 +302,71 @@ qplot(categorie, data = newDfClients,main = "Distributions des catégories sur l
 # install.packages("rpart.plot")
 # library(rpart)
 # library(rpart.plot)
+
+data <- newDfClients[, c("age", "sexe", "taux", "situationfamiliale", "nbenfantsacharge", "deuxiemevoiture", "categorie")]
+data$sexe <- factor(data$sexe, levels = unique(data$sexe))
+data$situationfamiliale <- factor(data$situationfamiliale, levels = unique(data$situationfamiliale))
+data$deuxiemevoiture <- factor(data$deuxiemevoiture, levels = unique(data$deuxiemevoiture))
+
+set.seed(123)
+trainIndex <- sample(1:nrow(data), 0.8 * nrow(data))
+trainData <- data[trainIndex, ]
+testData <- data[-trainIndex, ]
+
+# Réassurez-vous que les niveaux des facteurs sont définis correctement
+trainData$sexe <- factor(trainData$sexe, levels = levels(data$sexe))
+testData$sexe <- factor(testData$sexe, levels = levels(data$sexe))
+
+trainData$situationfamiliale <- factor(trainData$situationfamiliale, levels = levels(data$situationfamiliale))
+testData$situationfamiliale <- factor(testData$situationfamiliale, levels = levels(data$situationfamiliale))
+
+trainData$deuxiemevoiture <- factor(trainData$deuxiemevoiture, levels = levels(data$deuxiemevoiture))
+testData$deuxiemevoiture <- factor(testData$deuxiemevoiture, levels = levels(data$deuxiemevoiture))
+
+library(rpart)
+library(rpart.plot)
+
+# Modèle 1 : split = information, minbucket = 2500
+tree_rp1 <- rpart(categorie ~ ., data = trainData, method = "class", parms = list(split = "information"), control = rpart.control(minbucket = 2500))
+
+# Modèle 2 : split = gini, minbucket = 2500
+tree_rp2 <- rpart(categorie ~ ., data = trainData, method = "class", parms = list(split = "gini"), control = rpart.control(minbucket = 2500))
+
+# Modèle 3 : split = information, minbucket = 5000
+tree_rp3 <- rpart(categorie ~ ., data = trainData, method = "class", parms = list(split = "information"), control = rpart.control(minbucket = 5000))
+
+# Modèle 4 : split = gini, minbucket = 5000
+tree_rp4 <- rpart(categorie ~ ., data = trainData, method = "class", parms = list(split = "gini"), control = rpart.control(minbucket = 5000))
+
+pred_rp1 <- predict(tree_rp1, newdata = testData, type = "class")
+pred_rp2 <- predict(tree_rp2, newdata = testData, type = "class")
+pred_rp3 <- predict(tree_rp3, newdata = testData, type = "class")
+pred_rp4 <- predict(tree_rp4, newdata = testData, type = "class")
+
+library(caret)
+
+calculate_performance <- function(predictions, actuals) {
+  confusionMatrix(predictions, actuals)
+}
+
+# Évaluation des modèles
+performance_rp1 <- calculate_performance(pred_rp1, testData$categorie)
+performance_rp2 <- calculate_performance(pred_rp2, testData$categorie)
+performance_rp3 <- calculate_performance(pred_rp3, testData$categorie)
+performance_rp4 <- calculate_performance(pred_rp4, testData$categorie)
+
+# Affichage des résultats
+performance_rp1
+performance_rp2
+performance_rp3
+performance_rp4
+
+rpart.plot(tree_rp1, main = "Arbre de Décision - Modèle 1 (split = information, minbucket = 2500)")
+
+rpart.plot(tree_rp2, main = "Arbre de Décision - Modèle 2 (split = gini, minbucket = 2500)")
+
+rpart.plot(tree_rp3, main = "Arbre de Décision - Modèle 3 (split = information, minbucket = 5000)")
+
+rpart.plot(tree_rp4, main = "Arbre de Décision - Modèle 4 (split = gini, minbucket = 5000)")
+
+#tree_rp2 : Accurency 0.6046 tree_rp2

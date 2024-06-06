@@ -1,0 +1,19 @@
+nohup java -Xmx256m -Xms256m -jar $KVHOME/lib/kvstore.jar kvlite -secure-config disable -root $KVROOT > kvstore.log 2>&1 &
+
+start-dfs.sh
+
+start-yarn.sh
+
+nohup hive --service metastore > /dev/null &
+nohup hiveserver2 > /dev/null &
+
+nohup java -Xmx64m -Xms64m -jar $KVHOME/lib/kvstore.jar kvlite -secure-config disable -root $KVROOT &
+
+beeline
+
+!connect jdbc:hive2://localhost:10000
+
+nohup java -Xmx64m -Xms64m -jar $KVHOME/lib/kvstore.jar kvlite -secure-config disable -root $KVROOT &
+
+nohup java -Xmx64m -Xms64m -jar $KVHOME/lib/kvstore.jar kvlite -secure-config disable -root $KVROOT &
+
