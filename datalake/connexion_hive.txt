@@ -4,6 +4,8 @@ start-dfs.sh
 
 start-yarn.sh
 
+hiveserver2
+
 nohup hive --service metastore > /dev/null &
 nohup hiveserver2 > /dev/null &
 
