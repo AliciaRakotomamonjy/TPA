@@ -2,6 +2,7 @@ newDfClients <- merge(x = clients, y = joined_immatriculations_catalogue, by = "
 str(newDfClients)
 
 library(randomForest)
+library(lattice)
 library(caret) # Pour la fonction confusionMatrix
 
 # Supprimer les lignes avec des valeurs manquantes
@@ -21,6 +22,16 @@ predictions <- predict(rf_model, test_data)
 conf_matrix <- confusionMatrix(predictions, test_data$categorie)
 
 print(conf_matrix) #0.6071 
+
+marketing <- dbGetQuery(conn, "SELECT age,sexe,taux,situationFamiliale,nbenfantsacharge,deuxiemevoiture FROM marketing_kv_h_ext")
+
+str(marketing)
+
+marketing_predictions <- predict(rf_model, marketing)
+marketing$predicted_categorie <- marketing_predictions
+
+write.csv(marketing, file = "marketing.csv", row.names = FALSE)
+getwd()
 
 # Confusion Matrix and Statistics
 
