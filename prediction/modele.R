@@ -297,6 +297,7 @@ str(newDfClients)
 # Diagramme des effectifs des categories
 qplot(categorie, data = newDfClients,main = "Distributions des catégories sur les clients")
 
+##############################################ARBRES DE DECISION #####################
 
 # install.packages("rpart")
 # install.packages("rpart.plot")
@@ -361,12 +362,12 @@ performance_rp2
 performance_rp3
 performance_rp4
 
-rpart.plot(tree_rp1, main = "Arbre de Décision - Modèle 1 (split = information, minbucket = 2500)")
+#rpart.plot(tree_rp1, main = "Arbre de Décision - Modèle 1 (split = information, minbucket = 2500)")
 
-rpart.plot(tree_rp2, main = "Arbre de Décision - Modèle 2 (split = gini, minbucket = 2500)")
+#rpart.plot(tree_rp2, main = "Arbre de Décision - Modèle 2 (split = gini, minbucket = 2500)")
 
-rpart.plot(tree_rp3, main = "Arbre de Décision - Modèle 3 (split = information, minbucket = 5000)")
+#rpart.plot(tree_rp3, main = "Arbre de Décision - Modèle 3 (split = information, minbucket = 5000)")
 
-rpart.plot(tree_rp4, main = "Arbre de Décision - Modèle 4 (split = gini, minbucket = 5000)")
+#rpart.plot(tree_rp4, main = "Arbre de Décision - Modèle 4 (split = gini, minbucket = 5000)")
 
 #tree_rp2 : Accurency 0.6046 tree_rp2
