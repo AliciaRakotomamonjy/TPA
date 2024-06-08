@@ -7,23 +7,3 @@ mysql -u root -p
 CREATE DATABASE IF NOT EXISTS automobile;
 USE automobile;
 
-CREATE TABLE IF NOT EXISTS marketing (
-    age INT,
-    sexe VARCHAR(1),
-    taux INT,
-    situationfamiliale VARCHAR(50),
-    nbenfantsacharge INT,
-    deuxiemevoiture BOOLEAN,
-    predicted_categorie VARCHAR(50)
-);
-
-LOAD DATA INFILE '/vagrant/marketing.csv'
-INTO TABLE marketing
-FIELDS TERMINATED BY ',' 
-ENCLOSED BY '"'
-LINES TERMINATED BY '\n'
-IGNORE 1 LINES
-(age, sexe, taux, situationfamiliale, nbenfantsacharge, deuxiemevoiture, predicted_categorie);
-
-
-select * from marketing;
