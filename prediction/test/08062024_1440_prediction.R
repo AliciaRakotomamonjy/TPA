@@ -2,7 +2,7 @@ newDfClients <- merge(x = clients, y = joined_immatriculations_catalogue, by = "
 str(newDfClients)
 
 # Préparation des données
-# Sélection des colonnes d'intérêt
+# Sélection des colonnes
 data <- newDfClients[, c("age", "sexe", "taux", "situationfamiliale", "nbenfantsacharge", "deuxiemevoiture", "categorie")]
 
 # Conversion des colonnes catégorielles en facteurs
