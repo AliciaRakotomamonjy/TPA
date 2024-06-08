@@ -33,6 +33,22 @@ marketing$predicted_categorie <- marketing_predictions
 write.csv(marketing, file = "marketing.csv", row.names = FALSE)
 getwd()
 
+
+library(RMySQL)
+library(DBI)
+library(readr)
+
+conmyssql <- dbConnect(RMySQL::MySQL(), 
+                 dbname = "automobile", 
+                 host = "localhost", 
+                 port = 3306, 
+                 user = "root", 
+                 password = "")
+
+datas <- read_csv("marketing.csv")
+
+dbWriteTable(conmyssql, name = "marketing", value = datas, append = TRUE, row.names = FALSE)
+
 # Confusion Matrix and Statistics
 
 #                                    Reference
