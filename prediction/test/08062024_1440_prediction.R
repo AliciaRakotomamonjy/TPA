@@ -107,5 +107,7 @@ str(marketing)
 marketing_predictions <- predict(randomForestModel, marketing)
 marketing$predicted_categorie <- marketing_predictions
 
+print(marketing)
+
 write.csv(marketing, file = "marketing.csv", row.names = FALSE)
 getwd()
